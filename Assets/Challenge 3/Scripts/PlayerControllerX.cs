@@ -50,7 +50,7 @@ public class PlayerControllerX : MonoBehaviour
             explosionParticle.Play();
             playerAudio.PlayOneShot(explodeSound, 1.0f);
             gameOver = true;
-            Debug.Log("Game Over!");
+            Debug.Log("Game Over!");  
             Destroy(other.gameObject);
         } 
 
