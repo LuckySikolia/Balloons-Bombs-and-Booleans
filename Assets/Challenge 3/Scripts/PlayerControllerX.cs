@@ -23,7 +23,10 @@ public class PlayerControllerX : MonoBehaviour
     [SerializeField] private Transform bottomBorder;
 
     private bool isLowEnough;
-    private bool hasTouchedBottom = false;
+    //private bool hasTouchedBottom = false;
+    private bool hasCollidedWithBomb = false;
+    private float destroyTimer;
+    private float effectDuration = 0.5f;
 
         
 
@@ -37,6 +40,7 @@ public class PlayerControllerX : MonoBehaviour
         playerRb = GetComponent<Rigidbody>();
         // Apply a small upward force at the start of the game
         playerRb.AddForce(Vector3.up * 5, ForceMode.Impulse);
+        isLowEnough = true;
 
         
     }
@@ -50,8 +54,20 @@ public class PlayerControllerX : MonoBehaviour
         if (Input.GetKey(KeyCode.Space) && !gameOver && isLowEnough)
         {
             Debug.Log("Space Key Was Pressed!");
+            //hasTouchedBottom = false;/
             playerRb.AddForce(Vector3.up * floatForce);
             Debug.Log("the space bar works");
+        }
+
+        //check if the balloon has colided with bomb and destory the player after a short delay
+        if (hasCollidedWithBomb)
+        {
+            if(Time.time >= destroyTimer)
+            {
+                Destroy(gameObject);
+                //reset the state
+                hasCollidedWithBomb = false;
+            }
         }
 
     }
@@ -64,11 +80,16 @@ public class PlayerControllerX : MonoBehaviour
             fireworksParticle.Stop();
             explosionParticle.Play();
             
-            Debug.Log("The fireworks particle effect doesn't work");
+            //Debug.Log("The fireworks particle effect doesn't work");
             playerAudio.PlayOneShot(explodeSound, 1.0f);
             gameOver = true;
             Debug.Log("Game Over!");  
             Destroy(other.gameObject);
+
+            //set timer to destroy the player after the effects have been played
+            destroyTimer = Time.time + effectDuration;
+            hasCollidedWithBomb = true;
+            
         } 
 
         // if player collides with money, fireworks
@@ -90,21 +111,20 @@ public class PlayerControllerX : MonoBehaviour
         // Code for top and bottom border
         if (transform.position.y > topBorder.position.y)
         {
-
+            //hasTouchedBottom = false;
             transform.position = new Vector3(transform.position.x, topBorder.position.y, transform.position.z);
             isLowEnough = false;
             Debug.Log("Player is touching top bound");
         }
         else if (transform.position.y < bottomBorder.position.y)
         {
-            hasTouchedBottom = true;
+            //hasTouchedBottom = true;
             playerAudio.PlayOneShot(boundTouch, 1.0f);
             transform.position = new Vector3(transform.position.x, bottomBorder.position.y, transform.position.z);
             isLowEnough = true;
             
             Debug.Log("Player is touching bottom bound");
         }
-
 
 
 
